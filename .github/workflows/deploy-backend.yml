@@ -13,6 +13,7 @@ defaults:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:
       id-token: write
       contents: read
@@ -24,6 +25,7 @@ jobs:
           persist-credentials: false
 
       - name: Configure AWS credentials
+        id: aws-credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -31,17 +33,18 @@ jobs:
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build services with Docker Compose
-        run: docker-compose build
-
-      - name: Tag and Push to Amazon ECR
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: javascript-backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          REPOSITORY=javascript-backend # Assuming a single service for simplicity
-          docker tag $REPOSITORY:latest $REGISTRY/$REPOSITORY:$IMAGE_TAG
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          REPOSITORY=javascript-backend
+          IMAGE_NAME="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          docker tag javascript-backend:latest $IMAGE_NAME
+          docker push $IMAGE_NAME
+          echo "::set-output name=image::$IMAGE_NAME"
