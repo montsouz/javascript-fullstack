@@ -52,6 +52,7 @@ jobs:
         with:
           service: javascript-backend
           image: ${{ steps.build-image.outputs.image }}
+          access-role-arn: ${{ secrets.ROLE_ARN }}
           cpu: 1
           memory: 2
           region: us-east-1
