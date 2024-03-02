@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { sequelize } from "./config/database";
 import { IPlan, Plan } from "./models/plan";
 import { User, type IUser } from "./models/user";
@@ -9,6 +10,9 @@ import { authenticate } from "./middlewares/auth";
 
 const app = express();
 app.use(express.json());
+
+// enable CORS
+app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 async function assertDatabaseConnectionOk() {
