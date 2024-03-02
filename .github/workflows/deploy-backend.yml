@@ -43,8 +43,9 @@ jobs:
           ECR_REPOSITORY: javascript-backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t 317988454343.dkr.ecr.us-east-1.amazonaws.com/javascript-backend .
-          docker push 317988454343.dkr.ecr.us-east-1.amazonaws.com/javascript-backend
+          docker build -t javascript-backend .
+          docker tag javascript-backend:latest 317988454343.dkr.ecr.us-east-1.amazonaws.com/javascript-backend:latest
+          docker push 317988454343.dkr.ecr.us-east-1.amazonaws.com/javascript-backend:latest
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
       - name: Deploy to App Runner Image
