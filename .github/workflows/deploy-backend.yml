@@ -39,14 +39,12 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: javascript-backend
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: javascript-backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t javascript-backend .
-          docker tag javascript-backend:latest 317988454343.dkr.ecr.us-east-1.amazonaws.com/javascript-backend:latest
-          docker push 317988454343.dkr.ecr.us-east-1.amazonaws.com/javascript-backend:latest
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
       - name: Deploy to App Runner Image
         id: deploy-apprunner
@@ -57,8 +55,6 @@ jobs:
           cpu: 1
           memory: 2
           region: us-east-1
-          # Deprecated: wait-for-service-stability: true
-          # The new way to control service stability timeout
           wait-for-service-stability-seconds: 1200
 
       - name: App Runner URL
