@@ -1,4 +1,4 @@
-name: Deploy to App Runner
+name: Push to ECR
 on:
   push:
     branches: [main]
@@ -13,7 +13,6 @@ defaults:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:
       id-token: write
       contents: read
@@ -25,7 +24,6 @@ jobs:
           persist-credentials: false
 
       - name: Configure AWS credentials
-        id: aws-credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -33,31 +31,17 @@ jobs:
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
+      - name: Build services with Docker Compose
+        run: docker-compose build
+
+      - name: Tag and Push to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: javascript-backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          REPOSITORY=javascript-backend # Assuming a single service for simplicity
+          docker tag $REPOSITORY:latest $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
-
-      - name: Deploy to App Runner Image
-        id: deploy-apprunner
-        uses: awslabs/amazon-app-runner-deploy@main
-        with:
-          service: javascript-backend
-          image: ${{ steps.build-image.outputs.image }}
-          access-role-arn: "arn:aws:iam::317988454343:role/AppRunnerRole"
-          cpu: 1
-          memory: 2
-          region: us-east-1
-          wait-for-service-stability-seconds: 1200
-
-      - name: App Runner URL
-        run: echo "App runner URL ${{ steps.deploy-apprunner.outputs.service-url }}"
