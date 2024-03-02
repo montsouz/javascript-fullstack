@@ -1,8 +1,9 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
+import { User } from "./user";
 
-export const Plan = sequelize.define(
-  "Plan",
+export const Purchase = sequelize.define(
+  "Purchase",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,6 +13,13 @@ export const Plan = sequelize.define(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: User,
+        key: "id",
+      },
     },
     steps: {
       type: DataTypes.JSON,
@@ -23,8 +31,9 @@ export const Plan = sequelize.define(
   }
 );
 
-export interface IPlan {
+export interface IPurchase {
   id: number;
   name: string;
+  userId: number;
   steps: { name: string; order: number }[];
 }
