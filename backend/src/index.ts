@@ -84,3 +84,5 @@ app.get("/purchases", authenticate, async (req, res) => {
   const purchases = await Purchase.findAll({ where: { userId: req.userId } });
   res.json(purchases);
 });
+
+export { app };
