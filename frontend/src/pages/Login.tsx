@@ -17,6 +17,7 @@ import { login } from "../services/auth";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isInvalid, setIsInvalid] = useState(false);
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -34,6 +35,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login failed:", error);
+      setIsInvalid(true);
     }
   };
 
@@ -50,6 +52,12 @@ const Login = () => {
     >
       <Heading>Login</Heading>
       <Box as="form" onSubmit={handleSubmit} width="100%">
+        {isInvalid && (
+          <Text color="red.500" fontSize="sm">
+            Invalid email or password
+          </Text>
+        )}
+
         <FormControl id="email">
           <FormLabel>Email address</FormLabel>
           <Input

@@ -4,7 +4,7 @@ This repo implements a fullstack application that uses Node on the backend, and 
 
 Check out the deployed version here!
 
-[javascript-fullstack.vercel.app](https://javascript-fullstack.vercel.app/login)
+[javascript-fullstack.vercel.app](https://javascript-fullstack.vercel.app/)
 
 ## Backend
 
