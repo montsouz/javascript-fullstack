@@ -43,4 +43,32 @@ describe("Test endpoints", () => {
     expect(response.status).toBe(200);
     expect(response.body.id).toBeDefined();
   });
+
+  it("Gets purchased plans", async () => {
+    const response = await request
+      .get("/purchases")
+      .set("authorization", token);
+
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(1);
+  });
+
+  it("Updates the step of a purchase", async () => {
+    const response = await request
+      .put(`/purchases/1/order/2`)
+      .set("authorization", token);
+
+    expect(response.status).toBe(200);
+    expect(response.body.isComplete).toBe(true);
+  });
+
+  it("Uncheck the step of a purchase", async () => {
+    const response = await request
+      .put(`/purchases/1/order/2`)
+      .set("authorization", token);
+
+    console.log(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.isComplete).toBe(false);
+  });
 });

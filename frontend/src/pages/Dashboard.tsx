@@ -10,7 +10,7 @@ import {
   Flex,
   Button,
 } from "@chakra-ui/react";
-import { getPurchasedPlans } from "../services/purchase";
+import { getPurchasedPlans, updateStep } from "../services/purchase";
 import { useNavigate } from "react-router-dom";
 import { IconButton } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -18,9 +18,11 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 interface Step {
   name: string;
   order: number;
+  isComplete?: boolean;
 }
 
 interface Plan {
+  id: number;
   name: string;
   steps: Step[];
 }
@@ -44,6 +46,24 @@ const DashboardPage = () => {
 
     fetchPurchasedPlans();
   }, []);
+
+  function handleUpdateStep(planId: number, stepOrder: number) {
+    updateStep(Number(planId), stepOrder).then(() => {
+      const updatedPlans = purchasedPlans.map((plan) => {
+        if (plan.id === planId) {
+          const updatedSteps = plan.steps.map((step) => {
+            if (step.order === stepOrder) {
+              return { ...step, isComplete: step.isComplete ? false : true };
+            }
+            return step;
+          });
+          return { ...plan, steps: updatedSteps };
+        }
+        return plan;
+      });
+      setPurchasedPlans(updatedPlans);
+    });
+  }
 
   if (isLoading) {
     return <Text>Loading...</Text>;
@@ -103,7 +123,13 @@ const DashboardPage = () => {
                 {plan.steps
                   .sort((a, b) => a.order - b.order)
                   .map((step) => (
-                    <Checkbox key={step.order}>{step.name}</Checkbox>
+                    <Checkbox
+                      key={step.order}
+                      onChange={() => handleUpdateStep(plan.id, step.order)}
+                      isChecked={step.isComplete}
+                    >
+                      {step.name}
+                    </Checkbox>
                   ))}
               </Stack>
             </CheckboxGroup>

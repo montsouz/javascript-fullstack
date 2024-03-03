@@ -3,7 +3,7 @@ import cors from "cors";
 import { sequelize } from "./config/database";
 import { IPlan, Plan } from "./models/plan";
 import { User, type IUser } from "./models/user";
-import { Purchase } from "./models/purchase";
+import { IPurchase, Purchase } from "./models/purchase";
 import { seed } from "./seed";
 import { generateToken } from "./libs/jwt";
 import { authenticate } from "./middlewares/auth";
@@ -83,6 +83,28 @@ app.post("/purchases", authenticate, async (req, res) => {
 app.get("/purchases", authenticate, async (req, res) => {
   const purchases = await Purchase.findAll({ where: { userId: req.userId } });
   res.json(purchases);
+});
+
+app.put("/purchases/:id/order/:order", authenticate, async (req, res) => {
+  const { id, order } = req.params;
+
+  const purchase = (await Purchase.findByPk(Number(id))) as IPurchase | null;
+  if (!purchase) {
+    return res.status(404).json({ message: "Purchase not found" });
+  }
+
+  const steps = purchase.steps;
+  const step = steps.find((step) => step.order === Number(order));
+  if (!step) {
+    return res.status(404).json({ message: "Step not found" });
+  }
+
+  console.log(step);
+
+  step.isComplete = !step.isComplete;
+  await Purchase.update({ steps }, { where: { id } });
+
+  res.json(step);
 });
 
 export { app };

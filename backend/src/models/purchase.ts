@@ -31,9 +31,11 @@ export const Purchase = sequelize.define(
   }
 );
 
-export interface IPurchase {
+type Purchase = typeof Purchase;
+
+export interface IPurchase extends Purchase {
   id: number;
   name: string;
   userId: number;
-  steps: { name: string; order: number }[];
+  steps: { name: string; order: number; isComplete: boolean | undefined }[];
 }
