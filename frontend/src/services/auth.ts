@@ -1,5 +1,7 @@
+import { API_URL } from "../config";
+
 export async function login(email: string, password: string) {
-  const response = await fetch("http://localhost:3000/login", {
+  const response = await fetch(`${API_URL}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

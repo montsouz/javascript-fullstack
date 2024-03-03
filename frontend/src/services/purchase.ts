@@ -1,5 +1,7 @@
+import { API_URL } from "../config";
+
 export async function getPurchasedPlans() {
-  const response = await fetch("http://localhost:3000/purchases", {
+  const response = await fetch(`${API_URL}/purchases`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -15,7 +17,7 @@ export async function getPurchasedPlans() {
 }
 
 export async function purchasePlan(planId: number) {
-  const response = await fetch("http://localhost:3000/purchases", {
+  const response = await fetch(`${API_URL}/purchases`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

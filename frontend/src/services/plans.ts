@@ -1,5 +1,7 @@
+import { API_URL } from "../config";
+
 export async function fetchPlans() {
-  const response = await fetch("http://localhost:3000/plans", {
+  const response = await fetch(`${API_URL}/plans`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
