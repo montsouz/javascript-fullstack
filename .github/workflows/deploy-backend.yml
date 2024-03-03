@@ -36,18 +36,12 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build services with Docker Compose
-        run: docker-compose build
-
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: javascript-backend
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: latest
         run: |
-          REPOSITORY=javascript-backend
-          IMAGE_NAME="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
-          docker tag javascript-backend:latest $IMAGE_NAME
-          docker push $IMAGE_NAME
-          echo "::set-output name=image::$IMAGE_NAME"
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
